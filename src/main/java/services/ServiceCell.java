@@ -1,7 +1,7 @@
 package services;
 
-import models.Reference;
-import metamodels.Reference_;
+import metamodels.Cell_;
+import models.Cell;
 import utils.EntityManagerUtil;
 
 import javax.persistence.EntityManager;
@@ -11,35 +11,35 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-public class ServiceReference {
-    public ServiceReference() {
+public class ServiceCell {
+    public ServiceCell() {
     }
-    public Reference getReferenceByID(long id){
-        Reference reference = null;
+    public Cell getCellByID(long id){
+        Cell cell = null;
         EntityManager entityManager = null;
         try {
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
-            reference = entityManager.find(Reference.class, id);
-            entityManager.detach(reference);
+            cell = entityManager.find(Cell.class, id);
+            entityManager.detach(cell);
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
                 entityManager.getTransaction().rollback();
             }
         }
-        return reference;
+        return cell;
     }
 
     @SuppressWarnings("unchecked")
-    public List<Reference> getReferences(){
-        List<Reference> list = null;
+    public List<Cell> getCells(){
+        List<Cell> list = null;
         EntityManager entityManager = null;
         try {
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
 
-            list = entityManager.createQuery("from Reference").getResultList();
+            list = entityManager.createQuery("from Cell").getResultList();
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
@@ -49,7 +49,7 @@ public class ServiceReference {
         return list;
     }
 
-    public void save (Reference reference){
+    public void save (Cell reference){
 
         EntityManager entityManager = null;
         try{
@@ -65,29 +65,29 @@ public class ServiceReference {
         }
     }
 
-    public void removeReferenceByID(long id){
+    public void removeCellByID(long id){
 
     }
-    public Reference getReferenceByName(String field){
-        Reference reference = null;
+    public Cell getCellByName(String name){
+        Cell cell = null;
         EntityManager entityManager=null;
         try{
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
 
             CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-            CriteriaQuery<Reference> criteria = criteriaBuilder.createQuery(Reference.class);
-            Root<Reference> root = criteria.from(Reference.class);
-            criteria.where(criteriaBuilder.equal(root.get(Reference_.reference), field));
-            TypedQuery<Reference> typed = entityManager.createQuery(criteria);
+            CriteriaQuery<Cell> criteria = criteriaBuilder.createQuery(Cell.class);
+            Root<Cell> root = criteria.from(Cell.class);
+            criteria.where(criteriaBuilder.equal(root.get(Cell_.name), name));
+            TypedQuery<Cell> typed = entityManager.createQuery(criteria);
 
-            reference = typed.getSingleResult();
+            cell = typed.getSingleResult();
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
                 entityManager.getTransaction().rollback();
             }
         }
-        return reference;
+        return cell;
     }
 }

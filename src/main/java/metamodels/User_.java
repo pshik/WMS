@@ -1,4 +1,6 @@
-package models;
+package metamodels;
+
+import models.User;
 
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
@@ -11,4 +13,5 @@ public abstract class User_ {
     public static volatile SingularAttribute<User, Integer> email;
     public static volatile SingularAttribute<User, Integer> username;
     public static volatile SingularAttribute<User, Integer> role_name;
+    public static volatile SingularAttribute<User, Integer> password;
 }

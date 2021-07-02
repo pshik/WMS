@@ -1,5 +1,7 @@
 package services;
 
+import metamodels.Rack_;
+import models.Rack;
 import models.Reference;
 import metamodels.Reference_;
 import utils.EntityManagerUtil;
@@ -11,35 +13,35 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-public class ServiceReference {
-    public ServiceReference() {
+public class ServiceRack {
+    public ServiceRack() {
     }
-    public Reference getReferenceByID(long id){
-        Reference reference = null;
+    public Rack getRackByID(long id){
+        Rack rack = null;
         EntityManager entityManager = null;
         try {
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
-            reference = entityManager.find(Reference.class, id);
-            entityManager.detach(reference);
+            rack = entityManager.find(Rack.class, id);
+            entityManager.detach(rack);
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
                 entityManager.getTransaction().rollback();
             }
         }
-        return reference;
+        return rack;
     }
 
     @SuppressWarnings("unchecked")
-    public List<Reference> getReferences(){
-        List<Reference> list = null;
+    public List<Rack> getRacks(){
+        List<Rack> list = null;
         EntityManager entityManager = null;
         try {
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
 
-            list = entityManager.createQuery("from Reference").getResultList();
+            list = entityManager.createQuery("from Rack").getResultList();
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
@@ -49,14 +51,14 @@ public class ServiceReference {
         return list;
     }
 
-    public void save (Reference reference){
+    public void save (Rack rack){
 
         EntityManager entityManager = null;
         try{
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
 
-            entityManager.persist(reference);
+            entityManager.persist(rack);
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
@@ -65,29 +67,29 @@ public class ServiceReference {
         }
     }
 
-    public void removeReferenceByID(long id){
+    public void removeRackByID(long id){
 
     }
-    public Reference getReferenceByName(String field){
-        Reference reference = null;
+    public Rack getRackByName(String name){
+        Rack rack = null;
         EntityManager entityManager=null;
         try{
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
 
             CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-            CriteriaQuery<Reference> criteria = criteriaBuilder.createQuery(Reference.class);
-            Root<Reference> root = criteria.from(Reference.class);
-            criteria.where(criteriaBuilder.equal(root.get(Reference_.reference), field));
-            TypedQuery<Reference> typed = entityManager.createQuery(criteria);
+            CriteriaQuery<Rack> criteria = criteriaBuilder.createQuery(Rack.class);
+            Root<Rack> root = criteria.from(Rack.class);
+            criteria.where(criteriaBuilder.equal(root.get(Rack_.name), name));
+            TypedQuery<Rack> typed = entityManager.createQuery(criteria);
 
-            reference = typed.getSingleResult();
+            rack = typed.getSingleResult();
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
                 entityManager.getTransaction().rollback();
             }
         }
-        return reference;
+        return rack;
     }
 }

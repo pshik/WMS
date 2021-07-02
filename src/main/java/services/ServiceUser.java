@@ -1,7 +1,7 @@
 package services;
 
 import models.User;
-import models.User_;
+import metamodels.User_;
 import utils.EntityManagerUtil;
 
 import javax.persistence.EntityManager;

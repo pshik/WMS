@@ -26,15 +26,19 @@ public class User {
     @Column(name = "role_name")
     private String role_name;
 
+    @Column(name = "password")
+    private String password;
+
     public User() {
     }
 
-    public User(String firstName, String lastName, String email, String username, String role_name) {
+    public User(String username, String firstName, String lastName, String email,  String role_name, String password) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.username = username;
         this.role_name = role_name;
+        this.password = password;
     }
 
     public long getId() {

@@ -1,7 +1,7 @@
 package services;
 
-import models.Reference;
-import metamodels.Reference_;
+import metamodels.Pallet_;
+import models.Pallet;
 import utils.EntityManagerUtil;
 
 import javax.persistence.EntityManager;
@@ -11,35 +11,35 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
-public class ServiceReference {
-    public ServiceReference() {
+public class ServicePallet {
+    public ServicePallet() {
     }
-    public Reference getReferenceByID(long id){
-        Reference reference = null;
+    public Pallet getPalletByID(long id){
+        Pallet pallet = null;
         EntityManager entityManager = null;
         try {
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
-            reference = entityManager.find(Reference.class, id);
-            entityManager.detach(reference);
+            pallet = entityManager.find(Pallet.class, id);
+            entityManager.detach(pallet);
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
                 entityManager.getTransaction().rollback();
             }
         }
-        return reference;
+        return pallet;
     }
 
     @SuppressWarnings("unchecked")
-    public List<Reference> getReferences(){
-        List<Reference> list = null;
+    public List<Pallet> getPallets(){
+        List<Pallet> list = null;
         EntityManager entityManager = null;
         try {
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
 
-            list = entityManager.createQuery("from Reference").getResultList();
+            list = entityManager.createQuery("from Pallet").getResultList();
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
@@ -49,14 +49,14 @@ public class ServiceReference {
         return list;
     }
 
-    public void save (Reference reference){
+    public void save (Pallet pallet){
 
         EntityManager entityManager = null;
         try{
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
 
-            entityManager.persist(reference);
+            entityManager.persist(pallet);
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
@@ -65,29 +65,29 @@ public class ServiceReference {
         }
     }
 
-    public void removeReferenceByID(long id){
+    public void removePalletByID(long id){
 
     }
-    public Reference getReferenceByName(String field){
-        Reference reference = null;
+    public Pallet getPalletByMaterial(String material){
+        Pallet pallet = null;
         EntityManager entityManager=null;
         try{
             entityManager = EntityManagerUtil.getEntityManager();
             entityManager.getTransaction().begin();
 
             CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-            CriteriaQuery<Reference> criteria = criteriaBuilder.createQuery(Reference.class);
-            Root<Reference> root = criteria.from(Reference.class);
-            criteria.where(criteriaBuilder.equal(root.get(Reference_.reference), field));
-            TypedQuery<Reference> typed = entityManager.createQuery(criteria);
+            CriteriaQuery<Pallet> criteria = criteriaBuilder.createQuery(Pallet.class);
+            Root<Pallet> root = criteria.from(Pallet.class);
+            criteria.where(criteriaBuilder.equal(root.get(Pallet_.material), material));
+            TypedQuery<Pallet> typed = entityManager.createQuery(criteria);
 
-            reference = typed.getSingleResult();
+            pallet = typed.getSingleResult();
             entityManager.getTransaction().commit();
         } catch (Exception e){
             if(entityManager != null) {
                 entityManager.getTransaction().rollback();
             }
         }
-        return reference;
+        return pallet;
     }
 }

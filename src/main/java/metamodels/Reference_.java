@@ -1,4 +1,6 @@
-package models;
+package metamodels;
+
+import models.Reference;
 
 import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
