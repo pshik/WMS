@@ -14,6 +14,6 @@ public abstract class Cell_ {
     public static volatile SingularAttribute<Cell, String>  name;
     public static volatile SingularAttribute<Cell, Integer>  row;
     public static volatile SingularAttribute<Cell, Integer>  col;
-    public static volatile SingularAttribute<Cell, List<Pallet>>  pallets;
+    public static volatile SingularAttribute<Cell, Long[]>  palletIDs;
     public static volatile SingularAttribute<Cell, Boolean>  blocked;
 }

@@ -5,6 +5,7 @@ import models.*;
 import services.*;
 import utils.EntityManagerUtil;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -19,15 +20,15 @@ public class BaseFake {
         ServiceCell serviceCell = new ServiceCell();
         ServiceRack serviceRack = new ServiceRack();
         ServicePallet servicePallet = new ServicePallet();
+        Pallet testPallet = new Pallet("14535322452",1,new Date(),"Rack1:A3-0");
+        Pallet testPallet1 = new Pallet("14535322452",1,new Date(),"Rack1:A3-3");
+        Pallet testPallet2 = new Pallet("14535322452",1,new Date(),"Rack1:B3-3");
 
-        Reference reference1 = new Reference("61021230234-03","HL",1,"Rack1","Rack2","Rack3","Rack4","Rack5");
-        Reference reference2 = new Reference("61021230234-01","WR",1,"Rack1","Rack2","Rack3","Rack4","Rack5");
-        Reference reference3 = new Reference("14535322452-01","LR",2,"Rack1","Rack2","Rack5");
-        Reference reference4 = new Reference("14535322452","LR",3,"Rack1","Rack4","Rack5");
-        serviceReference.save(reference1);
-        serviceReference.save(reference2);
-        serviceReference.save(reference3);
-        serviceReference.save(reference4);
+        servicePallet.save(testPallet);
+        servicePallet.save(testPallet1);
+        servicePallet.save(testPallet2);
+
+
 
         User user1 = new User("dmitriy.suslennikov","Dmitriy","Suslennikov",	"dmitriy.suslennikov@grupoantolin.com",	"Administrator",	"12345");
         User user2 = new User("alexander.tebenkov","Alexander","Tebenkov",	"Alexander.Tebenkov@grupoantolin.com",	"LogisticManager",	"12345");
@@ -41,34 +42,37 @@ public class BaseFake {
 
 
 
-        Rack test1 = new Rack("Rack1",6,7,null);
-        Rack test2 = new Rack("Rack2",7,5,null);
-        Rack test3 = new Rack("Rack3",5,4,null);
-        Rack test4 = new Rack("Rack4",5,7,null);
-        Rack test5 = new Rack("Rack5",4,6,null);
+        Rack test1 = new Rack("Rack1",6,7);
+        Rack test2 = new Rack("Rack2",7,5);
+        Rack test3 = new Rack("Rack3",5,4);
+        Rack test4 = new Rack("Rack4",5,7);
+        Rack test5 = new Rack("Rack5",4,6);
         serviceRack.save(test1);
         serviceRack.save(test2);
         serviceRack.save(test3);
         serviceRack.save(test4);
         serviceRack.save(test5);
 
+        SapReference sapReference1 = new SapReference("61021230234-03",1,"HL", new Integer[]{1,2,3,4,5});
+        SapReference sapReference2 = new SapReference("61021230234-01",2,"WR",new Integer[]{1,2,3,4,5});
+        SapReference sapReference3 = new SapReference("14535322452-01",2,"LR",new Integer[]{1,2,3});
+        SapReference sapReference4 = new SapReference("14535322452",3,"LR",new Integer[]{1,4,5});
+        serviceReference.save(sapReference1);
+        serviceReference.save(sapReference2);
+        serviceReference.save(sapReference3);
+        serviceReference.save(sapReference4);
+
         for (Rack r: serviceRack.getRacks()
              ) {
-            Cell[][] cells = r.getCells();
-            for(int i = 0; i < cells.length; i++){
-                for( int j = 0; j < cells[i].length; j++){
-                    serviceCell.save(cells[i][j]);
+
+            for(int i = 0; i < r.getRow(); i++){
+                for( int j = 0; j < r.getCol(); j++){
+                    Cell cell = new Cell(r.getName() + ":" + colNames[j]+rowNames[i],i,j);
+                    serviceCell.save(cell);
                 }
             }
         }
 
-        Pallet testPallet = new Pallet("14535322452",1,new Date(),"Rack1:A3-0");
-        Pallet testPallet1 = new Pallet("14535322452",1,new Date(),"Rack1:A3-3");
-        Pallet testPallet2 = new Pallet("14535322452",1,new Date(),"Rack1:B3-3");
-
-        servicePallet.save(testPallet);
-        servicePallet.save(testPallet1);
-        servicePallet.save(testPallet2);
 
         String separator = "***************************************************************************";
         serviceUser.getUsers().forEach(user -> System.out.println(user.toString()));
@@ -79,7 +83,12 @@ public class BaseFake {
         System.out.println(separator);
         serviceRack.getRacks().forEach(rack -> System.out.println(rack.toString()));
         System.out.println(separator);
-        serviceReference.getReferences().forEach(reference -> System.out.println(reference.toString()));
+
+        List<SapReference> references = serviceReference.getReferences();
+        for(SapReference s: references){
+            System.out.println(s.toString());
+        }
+        //references.forEach(sapReference -> System.out.println(sapReference.toString()));
 
         EntityManagerUtil.shutdown();
     }

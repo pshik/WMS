@@ -2,8 +2,6 @@ package services;
 
 import metamodels.Rack_;
 import models.Rack;
-import models.Reference;
-import metamodels.Reference_;
 import utils.EntityManagerUtil;
 
 import javax.persistence.EntityManager;

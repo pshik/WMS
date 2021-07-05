@@ -6,44 +6,46 @@ import com.sun.istack.NotNull;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Arrays;
 
 @Entity
-@Table(name = "Cells", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
+@Table(name = "Cells", uniqueConstraints = {@UniqueConstraint(columnNames = {"address"})})
 public class Cell implements Serializable,Comparable<Cell> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id_cell")
     private long Id;
-    @Column(name = "name")
-    private String name;
+    @Column(name = "address")
+    private String address;
     @Column(name = "row")
     private int row;
     @Column(name = "col")
     private int col;
     @Column(name = "pallets")
-    private ArrayList<Pallet> pallets = new ArrayList<>();
+    private Long[] palletIDs;
     @Column(name = "blocked")
     private boolean blocked;
 
-    public Cell(String name, int row, int col, Pallet pallet) {
-        this.name = name;
+    public Cell(String address, int row, int col) {
+        this.address = address;
         this.row = row;
         this.col = col;
-        this.pallets.add(pallet);
+        this.palletIDs = new Long[6];
         this.blocked = false;
+
     }
 
     public long getId() {
         return Id;
     }
 
+
     public void setId(long id) {
         Id = id;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public void setRow(int row) {
@@ -54,8 +56,8 @@ public class Cell implements Serializable,Comparable<Cell> {
         this.col = col;
     }
 
-    public void setPallets(ArrayList<Pallet> pallets) {
-        this.pallets = pallets;
+    public void setPalletIDs(Long[] palletIDs) {
+        this.palletIDs = palletIDs;
     }
 
     public boolean isBlocked() {
@@ -66,18 +68,19 @@ public class Cell implements Serializable,Comparable<Cell> {
         this.blocked = blocked;
     }
 
-    public String getName() {
-        return name;
+    public String getAddress() {
+        return address;
     }
 
     @Override
     public String toString() {
         return "Cell{" +
-                "name='" + name + '\'' +
-                ", row='" + row + '\'' +
-                ", col='" + col + '\'' +
-                ", pallets=" + pallets +
-                ", blocked=" + blocked +
+                "Id=" + Id +
+                ", name='" + address + '\'' +
+                ", row=" + row +
+                ", col=" + col +
+                ", palletIDs=" + Arrays.toString(palletIDs) +
+                ", blocked=" + blocked + '\'' +
                 '}';
     }
 
@@ -89,56 +92,48 @@ public class Cell implements Serializable,Comparable<Cell> {
         return col;
     }
 
-    public ArrayList<Pallet> getPallets() {
-        if (pallets == null){
-            return null;
-        }else if (pallets.size() > 0) {
-            if (pallets.get(0) == null) return null;
-            return pallets;
-        } else {
-            pallets.add(null);
-            return pallets;
-        }
+    public Long[] getPalletIDs() {
+        return palletIDs;
     }
 
-    public void addPallet(Pallet pallet) {
-        // if size < max size add pallet
-        if (!isBlocked()) {
-            if (pallets == null ){
-                pallets = new ArrayList<>();
-                pallets.add(pallet);
-            } else if (pallets.get(0) == null) {
-                pallets.clear();
-                pallets.add(pallet);
-            } else pallets.add(pallet);
-        }//else sent error
-    }
+//    public void addPallet(Long palletID) {
+//        // if size < max size add pallet
+//        if (!isBlocked()) {
+//            if (palletIDs == null ){
+//                palletIDs = new ArrayList<>();
+//                palletIDs.add(palletID);
+//            } else if (palletIDs.get(0) == null) {
+//                palletIDs.clear();
+//                palletIDs.add(palletID);
+//            } else palletIDs.add(palletID);
+//        }//else sent error
+//    }
 
-    public void pickUpPallet(int position,String pallet) {
-        ArrayList<Pallet> tmp = new ArrayList<>();
-        tmp.addAll(pallets);
-        for (Pallet p : tmp) {
-            if (p != null && p.getMaterial().equals(pallet) && p.getPosition() == position) {
-                pallets.remove(p);
-               // System.out.println(";");
-            }
-        }
-        if (pallets.size() == 0) pallets.add(null);
-    }
+//    public void pickUpPallet(int position,String palletMaterial) {
+//        List<Long> tmp = new ArrayList<>();
+//        tmp.addAll(palletIDs);
+//        for (Pallet p : tmp) {
+//            if (p != null && p.getMaterial().equals(palletMaterial) && p.getPosition() == position) {
+//                palletIDs.remove(p);
+//               // System.out.println(";");
+//            }
+//        }
+//        if (palletIDs.size() == 0) palletIDs.add(null);
+//    }
 
-    public boolean isContainReference(String material) {
-        if(pallets == null) return false;
-        for (Pallet p : pallets){
-            if (p.getMaterial().equals(material)) return true;
-        }
-        return false;
-    }
+//    public boolean isContainReference(String material) {
+//        if(palletIDs == null) return false;
+//        for (Pallet p : palletIDs){
+//            if (p.getMaterial().equals(material)) return true;
+//        }
+//        return false;
+//    }
 
     public Cell() {
     }
 
     @Override
     public int compareTo(@NotNull Cell o) {
-        return name.compareTo(o.name);
+        return address.compareTo(o.address);
     }
 }

@@ -5,11 +5,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "Pallets", uniqueConstraints = {@UniqueConstraint(columnNames = {"material"})})
+@Table(name = "Pallets", uniqueConstraints = {@UniqueConstraint(columnNames = {"address"})})
 public class Pallet implements Serializable,Comparable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "id_pallet")
     private long Id;
     @Column(name = "material")
     private String material;
@@ -50,14 +50,16 @@ public class Pallet implements Serializable,Comparable {
     @Override
     public String toString() {
         return "Pallet{" +
-                "material='" + material + '\'' +
+                "Id=" + Id +
+                ", material='" + material + '\'' +
                 ", size=" + size +
                 ", loadingDate=" + loadingDate +
                 ", position=" + position +
+                ", address='" + address + '\'' +
                 '}';
     }
 
-    public Pallet(String material, int size, Date loadingDate,String address) {
+    public Pallet(String material, int size, Date loadingDate, String address) {
         this.material = material;
         this.size = size;
         this.loadingDate = loadingDate;
