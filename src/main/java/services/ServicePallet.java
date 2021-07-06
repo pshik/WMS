@@ -2,6 +2,7 @@ package services;
 
 import metamodels.Pallet_;
 import models.Pallet;
+import models.User;
 import utils.EntityManagerUtil;
 
 import javax.persistence.EntityManager;
@@ -89,5 +90,21 @@ public class ServicePallet {
             }
         }
         return pallet;
+    }
+
+    public void removeByID(Long id) {
+        EntityManager entityManager=null;
+        try
+        {
+            entityManager = EntityManagerUtil.getEntityManager();
+            entityManager.getTransaction().begin();
+            Pallet pallet = getPalletByID(id);
+            entityManager.remove(pallet);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            if(entityManager != null) {
+                entityManager.getTransaction().rollback();
+            }
+        }
     }
 }

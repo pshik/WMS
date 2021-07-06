@@ -2,6 +2,7 @@ package services;
 
 import metamodels.Cell_;
 import models.Cell;
+import models.User;
 import utils.EntityManagerUtil;
 
 import javax.persistence.EntityManager;
@@ -89,5 +90,21 @@ public class ServiceCell {
             }
         }
         return cell;
+    }
+
+    public void removeByID(Long id) {
+        EntityManager entityManager=null;
+        try
+        {
+            entityManager = EntityManagerUtil.getEntityManager();
+            entityManager.getTransaction().begin();
+            Cell cell = getCellByID(id);
+            entityManager.remove(cell);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            if(entityManager != null) {
+                entityManager.getTransaction().rollback();
+            }
+        }
     }
 }

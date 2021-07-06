@@ -2,6 +2,7 @@ package services;
 
 import metamodels.SapReference_;
 import models.SapReference;
+import models.User;
 import utils.EntityManagerUtil;
 
 import javax.persistence.EntityManager;
@@ -89,5 +90,21 @@ public class ServiceReference {
             }
         }
         return sapReference;
+    }
+
+    public void removeByID(Long id) {
+        EntityManager entityManager=null;
+        try
+        {
+            entityManager = EntityManagerUtil.getEntityManager();
+            entityManager.getTransaction().begin();
+            SapReference sapReference = getReferenceByID(id);
+            entityManager.remove(sapReference);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            if(entityManager != null) {
+                entityManager.getTransaction().rollback();
+            }
+        }
     }
 }

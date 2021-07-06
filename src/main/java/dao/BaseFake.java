@@ -5,14 +5,34 @@ import models.*;
 import services.*;
 import utils.EntityManagerUtil;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 
 public class BaseFake {
     private static final String[] colNames = new String[]{"A","B","C","D","E","F","G","H","I"};
     private static final String[] rowNames = new String[]{"1","2","3","4","5","6","7","8","9"};
+    private static Properties properties = new Properties() ;
+
+    static {
+        InputStream iStream = null;
+        try {
+            iStream = new FileInputStream(BaseFake.class.getProtectionDomain().getClassLoader().getResource("client.properties").getPath());
+            properties.load(iStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static Properties getProperties() {
+        return properties;
+    }
 
     public static void main(String[] args) {
         ServiceUser serviceUser = new ServiceUser();

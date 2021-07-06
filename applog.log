@@ -1,0 +1,6 @@
+WARN    2021-07-06 11:39:04,879 [JavaFX Application Thread] views.GUI  - GUI is started!
+DEBUG   2021-07-06 11:40:16,573 [JavaFX Application Thread] org.hibernate.internal.SessionFactoryImpl  - HHH000031: Closing
+DEBUG   2021-07-06 11:40:16,575 [JavaFX Application Thread] org.hibernate.type.spi.TypeConfiguration$Scope  - Un-scoping TypeConfiguration [org.hibernate.type.spi.TypeConfiguration$Scope@506f618c] from SessionFactory [org.hibernate.internal.SessionFactoryImpl@212ef7f2]
+DEBUG   2021-07-06 11:40:16,576 [JavaFX Application Thread] org.hibernate.service.internal.AbstractServiceRegistryImpl  - Implicitly destroying ServiceRegistry on de-registration of all child ServiceRegistries
+INFO    2021-07-06 11:40:16,577 [JavaFX Application Thread] org.hibernate.orm.connections.pooling  - HHH10001008: Cleaning up connection pool [jdbc:hsqldb:hsql://172.25.217.125:9001/GA]
+DEBUG   2021-07-06 11:40:16,623 [JavaFX Application Thread] org.hibernate.boot.registry.internal.BootstrapServiceRegistryImpl  - Implicitly destroying Boot-strap registry on de-registration of all child ServiceRegistries

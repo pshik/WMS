@@ -66,8 +66,20 @@ public class ServiceUser {
         }
     }
 
-    public void removeUserByID(long id){
-
+    public void removeByID(long id){
+        EntityManager entityManager=null;
+        try
+        {
+            entityManager = EntityManagerUtil.getEntityManager();
+            entityManager.getTransaction().begin();
+            User user = getUserByID(id);
+            entityManager.remove(user);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            if(entityManager != null) {
+                entityManager.getTransaction().rollback();
+            }
+        }
     }
     public User getUserByUsername(String username){
         User user = null;

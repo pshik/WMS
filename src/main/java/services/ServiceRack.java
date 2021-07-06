@@ -2,6 +2,7 @@ package services;
 
 import metamodels.Rack_;
 import models.Rack;
+import models.User;
 import utils.EntityManagerUtil;
 
 import javax.persistence.EntityManager;
@@ -89,5 +90,21 @@ public class ServiceRack {
             }
         }
         return rack;
+    }
+
+    public void removeByID(Long id) {
+        EntityManager entityManager=null;
+        try
+        {
+            entityManager = EntityManagerUtil.getEntityManager();
+            entityManager.getTransaction().begin();
+            Rack rack = getRackByID(id);
+            entityManager.remove(rack);
+            entityManager.getTransaction().commit();
+        }catch (Exception e){
+            if(entityManager != null) {
+                entityManager.getTransaction().rollback();
+            }
+        }
     }
 }

@@ -16,7 +16,7 @@
         <property name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect"/>
         <property name="hibernate.hbm2ddl.auto" value="update"/>
         <property name="javax.persistence.jdbc.driver" value="org.hsqldb.jdbcDriver"/>
-        <property name="javax.persistence.jdbc.url" value="jdbc:hsqldb:hsql://172.25.217.125:9001/GA"/>
+
         <property name="javax.persistence.jdbc.user" value="sa"/>
         <property name="javax.persistence.jdbc.password" value=""/>
         <property name="hibernate.archive.autodetection" value="" />
