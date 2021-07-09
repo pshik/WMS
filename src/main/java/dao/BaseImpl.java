@@ -1,10 +1,12 @@
 package dao;
 
+import controllers.ControllerGUI;
 import models.*;
 import services.*;
 import utils.EntityManagerUtil;
 import views.GUI;
 
+import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,10 +21,11 @@ public class BaseImpl implements Base{
     private final ServiceCell serviceCell = new ServiceCell();
     private final ServiceRack serviceRack = new ServiceRack();
     private final ServicePallet servicePallet = new ServicePallet();
+    private ControllerGUI controllerGUI;
 
-
-    public BaseImpl() {
+    public BaseImpl(ControllerGUI controller) {
         reloadAll();
+        this.controllerGUI = controller;
     }
 
     public List<Cell> getCells() {
@@ -45,13 +48,27 @@ public class BaseImpl implements Base{
         return users;
     }
 
+    public void reconnect(){
+
+        if(EntityManagerUtil.getEntityManager() != null) EntityManagerUtil.shutdown();
+
+    }
     @Override
     public void reloadAll() {
-        users = serviceUser.getUsers();
-        cells = serviceCell.getCells();
-        pallets = servicePallet.getPallets();
-        racks = serviceRack.getRacks();
-        sapReferences = serviceReference.getReferences();
+        try {
+                users = serviceUser.getUsers();
+                cells = serviceCell.getCells();
+                pallets = servicePallet.getPallets();
+                racks = serviceRack.getRacks();
+                sapReferences = serviceReference.getReferences();
+        } catch (Exception e){
+            users = null;
+            cells = null;
+            pallets = null;
+            racks = null;
+            sapReferences = null;
+            controllerGUI.logger.error("Base is not available!");
+        }
     }
 
     @Override
@@ -72,7 +89,7 @@ public class BaseImpl implements Base{
                     serviceUser.save((User) entity);
                 } else {
                     System.out.println("Save: Entity don't instanceof User!");
-                    GUI.logger.warn("Save: Entity don't instanceof User!");
+                    controllerGUI.logger.warn("Save: Entity don't instanceof User!");
                 }
                 break;
             case "SapReferences":
@@ -80,7 +97,7 @@ public class BaseImpl implements Base{
                     serviceReference.save((SapReference) entity);
                 } else {
                     System.out.println("Save: Entity don't instanceof SapReference!");
-                    GUI.logger.warn("Save: Entity don't instanceof SapReference!");
+                    controllerGUI.logger.warn("Save: Entity don't instanceof SapReference!");
                 }
                 break;
             case "Racks":
@@ -88,7 +105,7 @@ public class BaseImpl implements Base{
                     serviceRack.save((Rack) entity);
                 } else {
                     System.out.println("Save: Entity don't instanceof Rack!");
-                    GUI.logger.warn("Save: Entity don't instanceof Rack!");
+                    controllerGUI.logger.warn("Save: Entity don't instanceof Rack!");
                 }
                 break;
             case "Pallets":
@@ -96,7 +113,7 @@ public class BaseImpl implements Base{
                     servicePallet.save((Pallet) entity);
                 } else {
                     System.out.println("Save: Entity don't instanceof Pallet!");
-                    GUI.logger.warn("Save: Entity don't instanceof Pallet!");
+                    controllerGUI.logger.warn("Save: Entity don't instanceof Pallet!");
                 }
                 break;
             case "Cells":
@@ -104,7 +121,7 @@ public class BaseImpl implements Base{
                     serviceCell.save((Cell) entity);
                 } else {
                     System.out.println("Save: Entity don't instanceof Cell!");
-                    GUI.logger.warn("Save: Entity don't instanceof Cell!");
+                    controllerGUI.logger.warn("Save: Entity don't instanceof Cell!");
                 }
                 break;
             default:
