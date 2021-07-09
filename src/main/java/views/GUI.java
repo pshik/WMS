@@ -64,7 +64,6 @@ public class GUI extends Application {
         controllerRack.currentUser.setText(s);
         List<SapReference> sapReferences = controller.getBase().getSapReferences();
         sapReferences.forEach(sapReference -> controllerRack.cmbReference.getItems().add(sapReference.getName()));
-        controllerRack.cmbReference.setValue(sapReferences.get(0).getName());
         List<Rack> racks = controller.getBase().getRacks();
         racks.forEach(rack -> controllerRack.cmbRack.getItems().add(rack.getName()));
         controllerRack.cmbRack.setValue(racks.get(0).getName());

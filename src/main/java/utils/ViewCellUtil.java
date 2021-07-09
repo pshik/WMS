@@ -84,8 +84,9 @@ public class ViewCellUtil {
     public void setUnAvailable(Button btn){
         btn.setGraphic(new ImageView(iconEmpty));
         btn.setStyle("-fx-background-color: #" + colorToHex(BUSY_COLOR_FREE_CELL));
-
     }
+
+
 //    public void selectCell(int i) {
 //      //  prevNum = i;
 //        switch (i){

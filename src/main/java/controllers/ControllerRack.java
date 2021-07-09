@@ -33,8 +33,13 @@ public class ControllerRack {
     public Pane rackPane;
     @FXML
     public ComboBox<String> cmbRack;
+
     @FXML
-    public TextArea cellInfo;
+    public Label cellInfoAddress;
+    @FXML
+    public Label cellInfoReference;
+    @FXML
+    public Label cellInfoDate;
     @FXML
     public Label currentUser;
     private static Map<String,List<Integer>> map = new HashMap<>();
@@ -47,7 +52,7 @@ public class ControllerRack {
    // private Image    iconPallet = new Image(GUI.class.getProtectionDomain().getClassLoader().getResource("/icons/pallet.png").toString());
    // private Image iconEmpty = new Image(GUI.class.getProtectionDomain().getClassLoader().getResource("/icons/empty.png").toString());
     static {
-        map.put("4", Arrays.asList(3));
+        map.put("4",Arrays.asList(3));
         map.put("5",Arrays.asList(3));
         map.put("6",Arrays.asList(3));
         map.put("2",Arrays.asList(2,3));
@@ -58,6 +63,7 @@ public class ControllerRack {
 
     @FXML
     private void loadReference(){
+
     }
 
     @FXML
@@ -68,7 +74,7 @@ public class ControllerRack {
     private void changeRack(){
         rackPane.getChildren().clear();
         loadRack(cmbRack.getValue());
-        showAvailableCells();
+        //showAvailableCells();
     }
 
     @FXML
@@ -117,7 +123,7 @@ public class ControllerRack {
         updateLists();
         Rack rack = racks.stream().filter(r -> rackName.equals(r.getName())).findAny().orElse(null);
 
-        cellInfo.clear();
+        clearCellInfo();
 
 
         int currentRackRowCount = rack.getRow();
@@ -148,7 +154,7 @@ public class ControllerRack {
         numberRow.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                cellInfo.clear();
+                clearCellInfo();
             }
         });
 
@@ -160,7 +166,7 @@ public class ControllerRack {
             colHeader.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
-                    cellInfo.clear();
+                    clearCellInfo();
                 }
             });
             setSize(colHeader,colWidth,headerHeight);
@@ -176,7 +182,7 @@ public class ControllerRack {
             row.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent mouseEvent) {
-                    cellInfo.clear();
+                    clearCellInfo();
                 }
             });
             setSize(row,numberRowWidth,rowHeight);
@@ -273,11 +279,15 @@ public class ControllerRack {
         button.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                cellInfo.clear();
-                cellInfo.appendText(cellName + " [" + position+ "]\n");
-                cellInfo.appendText("[" + position+ "]");
+                clearCellInfo();
+                cellInfoAddress.setText(cellName + " [" + position+ "]");
+
             }
         });
     }
-
+    private void clearCellInfo() {
+        cellInfoAddress.setText("");
+        cellInfoDate.setText("");
+        cellInfoReference.setText("");
+    }
 }

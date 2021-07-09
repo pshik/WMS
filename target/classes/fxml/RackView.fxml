@@ -64,14 +64,31 @@
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
             </ScrollPane>
-            <TextArea fx:id="cellInfo" editable="false" maxHeight="150.0" maxWidth="225.0" minHeight="150.0" minWidth="225.0" prefHeight="150.0" prefWidth="225.0">
-               <font>
-                  <Font name="Tahoma" size="24.0" />
-               </font>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label fx:id="cellInfoAddress" alignment="CENTER">
+                     <font>
+                        <Font name="Tahoma" size="24.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="cellInfoReference" alignment="CENTER">
+                     <font>
+                        <Font name="Tahoma" size="24.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="cellInfoDate" alignment="CENTER">
+                     <font>
+                        <Font name="Tahoma" size="24.0" />
+                     </font>
+                  </Label>
+               </children>
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
-            </TextArea>
+            </VBox>
             <Label fx:id="currentUser" alignment="CENTER_RIGHT" contentDisplay="CENTER" textFill="#a9bf39">
                <VBox.margin>
                   <Insets bottom="10.0" left="50.0" right="10.0" top="10.0" />
