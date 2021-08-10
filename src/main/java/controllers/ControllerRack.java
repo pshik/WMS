@@ -1,5 +1,8 @@
 package controllers;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -8,41 +11,69 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import models.Cell;
 import models.Pallet;
 import models.Rack;
 import models.SapReference;
+import services.ServiceLogger;
+import utils.PropertiesUtil;
 import utils.ViewCellUtil;
 import views.GUI;
 
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ControllerRack {
     private GUI gui;
     @FXML
-    public ComboBox<String> cmbReference;
+    private ComboBox<String> cmbReference;
     @FXML
-    public Button btnLoad;
+    private Button btnLoad;
     @FXML
-    public Button btnPickUp;
+    private Button btnPickUp;
     @FXML
-    public TextArea txtLog;
+    private Pane rackPane;
     @FXML
-    public Pane rackPane;
+    private ComboBox<String> cmbRack;
     @FXML
-    public ComboBox<String> cmbRack;
+    private Label cellInfoAddress;
+    @FXML
+    private Label cellInfoReference;
+    @FXML
+    private Label cellInfoDate;
+    @FXML
+    private Label currentUser;
+    @FXML
+    private RadioButton showAvailableCells;
+    @FXML
+    private RadioButton showMaterials;
+    @FXML
+    private CheckBox manualDate;
+    @FXML
+    private CheckBox forcePickUp;
 
-    @FXML
-    public Label cellInfoAddress;
-    @FXML
-    public Label cellInfoReference;
-    @FXML
-    public Label cellInfoDate;
-    @FXML
-    public Label currentUser;
+
+    public ComboBox<String> getCmbReference() {
+        return cmbReference;
+    }
+
+    public ComboBox<String> getCmbRack() {
+        return cmbRack;
+    }
+
+    public Label getCurrentUser() {
+        return currentUser;
+    }
+
+    public Label getCellInfoDate() {
+        return cellInfoDate;
+    }
+
     private static Map<String,List<Integer>> map = new HashMap<>();
     private List<Cell> cells;
     private List<Rack> racks;
@@ -50,8 +81,7 @@ public class ControllerRack {
     private ViewCellUtil viewCellUtil = new ViewCellUtil();
     private List<Button> rackList = new ArrayList<>();
 
-   // private Image    iconPallet = new Image(GUI.class.getProtectionDomain().getClassLoader().getResource("/icons/pallet.png").toString());
-   // private Image iconEmpty = new Image(GUI.class.getProtectionDomain().getClassLoader().getResource("/icons/empty.png").toString());
+
     static {
         map.put("4",Arrays.asList(3));
         map.put("5",Arrays.asList(3));
@@ -59,90 +89,240 @@ public class ControllerRack {
         map.put("2",Arrays.asList(2,3));
         map.put("3",Arrays.asList(2,3));
         map.put("1",Arrays.asList(1,2,3));
+
+
     }
 
+    public ControllerRack() {
+
+    }
 
     @FXML
     private void loadReference(){
-        Button btn = rackList.stream().filter(button -> button.getId().equals(cellInfoAddress.getText())).findAny().orElse(null);
-        showAvailableCells();
-        if(btn != null) {
-            if(viewCellUtil.checkAvailableButton(btn)) {
-                cellInfoReference.setText(cmbReference.getValue());
-                Cell cell = cells.stream().filter(c -> c.getAddress().equals(cmbRack.getValue()+":"+cellInfoAddress.getText().split(":")[0])).findAny().orElse(null);
-                Pallet pallet = new Pallet();
-                //  pallet.setAddress(cellInfoAddress.getText());
-                pallet.setMaterial(cmbReference.getValue());
-                int i = Integer.parseInt(cellInfoAddress.getText().split(":")[1]);
-                pallet.setPosition(i);
-                SapReference reference = references.stream().filter(r -> r.getName().equals(cmbReference.getValue())).findAny().orElse(null);
-                pallet.setSize(reference.getSize());
-                pallet.setLoadingDate(new Date());
-                if(cell.addPallet(pallet)){
-                    GUI.controller.getBase().update(cell);
-                    GUI.controller.getBase().reloadTable(Cell.class);
-                }
+        if(showAvailableCells.isSelected()){
+            Button btn = rackList.stream().filter(button -> button.getId().equals(cellInfoAddress.getText())).findAny().orElse(null);
+            markCellsAsBusy();
+            if(btn != null) {
+                if (viewCellUtil.checkAvailableButton(btn)) {
+                    cellInfoReference.setText(cmbReference.getValue());
+                    Cell cell = cells.stream().filter(c -> c.getAddress().equals(cmbRack.getValue() + ":" + cellInfoAddress.getText().split(":")[0])).findAny().orElse(null);
+                    int i = Integer.parseInt(cellInfoAddress.getText().split(":")[1]);
+                    SapReference reference = references.stream().filter(r -> r.getName().equals(cmbReference.getValue())).findAny().orElse(null);
 
-                showRack(cmbRack.getValue());
+                    Pallet pallet = new Pallet();
+                    pallet.setMaterial(cmbReference.getValue());
+                    pallet.setPosition(i);
+                    pallet.setSize(reference.getSize());
+                    pallet.setLoadingDate(new Date());
+
+                    if (cell.addPallet(pallet)) {
+                        GUI.controller.getBase().update(cell);
+                        GUI.controller.getBase().reloadTable(Cell.class);
+                    }
+                   // showMaterials.setDisable(false);
+                    showAvailableCells.setSelected(false);
+                    changeAvailableInterfaceStatus(false);
+                    showRack(cmbRack.getValue(), cmbReference.getValue());
+                }
             }
         }
+    }
+
+    private void markCellsAsBusy() {
+        List<Cell> cellsOfRack = this.cells.stream().filter(c -> c.getAddress().split(":")[0].equals(cmbRack.getValue())).toList();
+        for (Cell cell: cellsOfRack) {
+            List<Button> buttons = rackList.stream().filter(button -> button.getId().split(":")[0].equals(cell.getAddress().split(":")[1])).toList();
+
+            for (Button btn: buttons){
+                if(btn.getText().equals("")) {
+                    boolean free = true;
+                    switch (btn.getId().split(":")[1]) {
+                        case "1":
+                            for (Button b : buttons) {
+                                if (b != btn) {
+                                    if (!b.getText().equals("")) {
+                                        free=false;
+                                    }
+                                }
+                            }
+                            break;
+                        case "2":
+                            for (Button b : buttons) {
+                                if (b != btn) {
+                                    int pos = Integer.parseInt(b.getId().split(":")[1]);
+                                    if(pos == 1 || pos == 4 || pos == 5) {
+                                        if (!b.getText().equals("")) {
+                                            free = false;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case "3":
+                            for (Button b : buttons) {
+                                if (b != btn) {
+                                    int pos = Integer.parseInt(b.getId().split(":")[1]);
+                                    if(pos == 1 || pos == 5 || pos == 6) {
+                                        if (!b.getText().equals("")) {
+                                            free = false;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case "4":
+                            for (Button b : buttons) {
+                                if (b != btn) {
+                                    int pos = Integer.parseInt(b.getId().split(":")[1]);
+                                    if(pos == 1 || pos == 2) {
+                                        if (!b.getText().equals("")) {
+                                            free = false;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case "5":
+                            for (Button b : buttons) {
+                                if (b != btn) {
+                                    int pos = Integer.parseInt(b.getId().split(":")[1]);
+                                    if(pos == 1 || pos == 2 || pos == 3) {
+                                        if (!b.getText().equals("")) {
+                                            free = false;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        case "6":
+                            for (Button b : buttons) {
+                                if (b != btn) {
+                                    int pos = Integer.parseInt(b.getId().split(":")[1]);
+                                    if(pos == 1 || pos == 3) {
+                                        if (!b.getText().equals("")) {
+                                            free = false;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                    if (free) {
+                        viewCellUtil.setDefault(btn);
+                    } else {
+                        viewCellUtil.setUnAvailable(btn);
+                    }
+                }else {
+                    viewCellUtil.setBusyStatus(btn);
+                }
+            }
+
+        }
+    }
+    public void init(){
+        cmbRack.setEditable(false);
+        cmbReference.setEditable(false);
+        showAvailableCells.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if(showMaterials.isSelected()) showMaterials.setSelected(false);
+                if(showAvailableCells.isSelected()){
+                    changeAvailableInterfaceStatus(true);
+                    showAvailableCells();
+                } else {
+                    changeAvailableInterfaceStatus(false);
+                    btnPickUp.setDisable(false);
+                    markCellsAsBusy();
+                }
+            }
+        });
+        showMaterials.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if(showAvailableCells.isSelected()) showAvailableCells.setSelected(false);
+                if(showMaterials.isSelected()){
+                    cmbRack.setDisable(true);
+                    cmbReference.setDisable(true);
+                    manualDate.setDisable(true);
+                    forcePickUp.setDisable(true);
+                    showAvailableCells.setDisable(true);
+                    btnLoad.setDisable(true);
+                    btnPickUp.setDisable(true);
+                    showAllRefOnRack();
+                } else {
+                    cmbRack.setDisable(false);
+                    cmbReference.setDisable(false);
+                    manualDate.setDisable(false);
+                    forcePickUp.setDisable(false);
+                    showAvailableCells.setDisable(false);
+                    btnLoad.setDisable(false);
+                    btnPickUp.setDisable(false);
+                    markCellsAsBusy();
+                }
+            }
+        });
+    }
+
+    private void changeAvailableInterfaceStatus(boolean b) {
+        cmbRack.setDisable(b);
+        cmbReference.setDisable(b);
+        manualDate.setDisable(b);
+        forcePickUp.setDisable(b);
+        showMaterials.setDisable(b);
+        btnPickUp.setDisable(b);
     }
 
     @FXML
     private void pickUpReference(){
-        Button btn = rackList.stream().filter(button -> button.getId().equals(cellInfoAddress.getText())).findAny().orElse(null);
-        showAvailableCells();
-        if(btn != null) {
-            int position = Integer.parseInt(cellInfoAddress.getText().split(":")[1]);
-            Cell cell = cells.stream().filter(c -> c.getAddress().equals(cmbRack.getValue()+":"+cellInfoAddress.getText().split(":")[0])).findAny().orElse(null);
-            Pallet[] pallets = cell.getPallets();
-            for( int i = 0; i<pallets.length; i++){
-                if(pallets[i] != null) {
-                    if (pallets[i].getPosition() == position) {
-                        cell.deletePallet(pallets[i].getPosition());
-                    }
-                }
-            }
-
-            GUI.controller.getBase().update(cell);
-            showRack(cmbRack.getValue());
-        }
+        showMaterialForPickUP( cmbReference.getValue(), forcePickUp.isSelected());
     }
     @FXML
     private void changeRack(){
         rackPane.getChildren().clear();
-        showRack(cmbRack.getValue());
+        showRack(cmbRack.getValue(),null);
     }
 
     @FXML
     private void showAvailableCells(){
         for (Button btn: rackList
         ) {
-            btnStatus( btn);
+            String name = btn.getId();
+            if(btn.getText().equals("")) {
+                List<Integer> list = map.get(name.split(":")[1]);
+                SapReference reference = references.stream().filter(ref -> ref.getName().equals(cmbReference.getValue())).findAny().orElse(null);
+                if (list.contains(reference.getSize()) && viewCellUtil.checkAvailableButton(btn)) {
+                    viewCellUtil.setAvailable(btn);
+                } else {
+                    viewCellUtil.setUnAvailable(btn);
+                }
+            } else {
+                viewCellUtil.setBusyStatus(btn);
+            }
         }
     }
 
-    private void btnStatus(Button btn) {
-        String name = btn.getId();
-        if(btn.getText().equals("")) {
-            List<Integer> list = map.get(name.split(":")[1]);
-            SapReference reference = references.stream().filter(ref -> ref.getName().equals(cmbReference.getValue())).findAny().orElse(null);
-            if (list.contains(reference.getSize())) {
-                viewCellUtil.setDefault(btn);
-            } else {
-                viewCellUtil.setUnAvailable(btn);
+    private void showAllRefOnRack(){
+        markCellsAsBusy();
+        for(Button b: rackList){
+            if(!btnPickUp.getText().equals("")){
+                if(b.getText().equals(cmbReference.getValue())){
+                    viewCellUtil.highlightRef(b);
+                }
             }
-        } else {
-            viewCellUtil.setBusyStatus(btn);
         }
+
     }
 
     @FXML
-    public void showRack(String rackName){
+    public void showRack(String rackName, String ref){
 
         updateLists();
         rackList.clear();
-        cmbReference.setValue(cmbReference.getItems().get(0));
+        if(ref == null) {
+            cmbReference.setValue(cmbReference.getItems().get(0));
+        } else {
+            cmbReference.setValue(ref);
+        }
         Rack rack = racks.stream().filter(r -> rackName.equals(r.getName())).findAny().orElse(null);
 
         clearCellInfo();
@@ -261,7 +441,7 @@ public class ControllerRack {
             table.getChildren().add(rowHbox);
         }
         rackPane.getChildren().add(table);
-        showAvailableCells();
+        markCellsAsBusy();
     }
 
     private void setSize(Node node, double width, double height) {
@@ -297,12 +477,28 @@ public class ControllerRack {
         cells = GUI.controller.getBase().getCells();
         references = GUI.controller.getBase().getSapReferences();
     }
+    public void startTimer(){
+        Timeline fiveSecondsWonder = new Timeline(
+                new KeyFrame(Duration.seconds(Integer.parseInt(PropertiesUtil.getProperties().getProperty("timer.for.refresh.sec","5"))),
+                        new EventHandler<ActionEvent>() {
 
+                            @Override
+                            public void handle(ActionEvent event) {
+                                System.out.println("this is called every 10 seconds on UI thread");
+                                if(!showAvailableCells.isSelected() && !showMaterials.isSelected() && !manualDate.isSelected() && !forcePickUp.isSelected()) {
+                                    showRack(cmbRack.getValue(),cmbReference.getValue());
+                                }
+                            }
+                        }));
+        fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+        fiveSecondsWonder.play();
+    }
     private void btnConfig(Button button, double btnWidth, double btnHeight, String cellName, int position,Pallet[] pallets) {
         viewCellUtil.setDefault(button);
         setSize(button,btnWidth,btnHeight);
         button.setId(cellName + ":"+position);
         Pallet currPallet = null;
+       // DataBuilder data = new DataBuilder();
         for (Pallet p : pallets) {
             if(p != null ) {
                 if (p.getPosition() == position) {
@@ -326,14 +522,108 @@ public class ControllerRack {
                     SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     cellInfoDate.setText(format.format(finalPallet.getLoadingDate()));
                 }
-                showAvailableCells();
+                if(!showAvailableCells.isSelected()){
+                    markCellsAsBusy();
+                }
                 viewCellUtil.selectedCell(button);
             }
         });
     }
+
+    private void showMaterialForPickUP(String material, boolean isForced){
+        if(isForced){
+            Button btn = rackList.stream().filter(button -> button.getId().equals(cellInfoAddress.getText())).findAny().orElse(null);
+            markCellsAsBusy();
+            if(btn != null) {
+                int position = Integer.parseInt(cellInfoAddress.getText().split(":")[1]);
+                Cell cell = cells.stream().filter(c -> c.getAddress().equals(cmbRack.getValue()+":"+cellInfoAddress.getText().split(":")[0])).findAny().orElse(null);
+                Pallet[] pallets = cell.getPallets();
+                for( int i = 0; i<pallets.length; i++){
+                    if(pallets[i] != null) {
+                        if (pallets[i].getPosition() == position) {
+                            cell.deletePallet(pallets[i].getPosition());
+                        }
+                    }
+                }
+                forcePickUp.setSelected(false);
+                GUI.controller.getBase().update(cell);
+                showRack(cmbRack.getValue(),cmbReference.getValue());
+            }
+        } else {
+            LocalDateTime currentDate = LocalDateTime.now();
+            currentDate = currentDate.minusDays(Integer.parseInt(PropertiesUtil.getProperties().getProperty("days.lock","4")));
+            ArrayList<Cell> selectedCells = new ArrayList<>();
+            for(Cell cell: cells){
+                for (Pallet p: cell.getPallets()) {
+                    if(p != null) {
+                        if (p.getMaterial().equals(cmbReference.getValue())) {
+                            selectedCells.add(cell);
+                            break;
+                        }
+                    }
+                }
+            }
+            Pallet pallet = null;
+            Cell cell = null;
+            if(selectedCells.size() >0) {
+                for (Cell c : selectedCells) {
+                    for (Pallet p : c.getPallets()) {
+                        if(p != null) {
+                            LocalDateTime tmp = convertToLocalDateTime(p.getLoadingDate());
+                            if (tmp.isBefore(currentDate)) {
+                                pallet = p;
+                                cell = c;
+                                currentDate = convertToLocalDateTime(p.getLoadingDate());
+                            }
+                        }
+                    }
+                }
+                if (cell != null) {
+                    String rackName = cell.getAddress().split(":")[0];
+                    if (!rackName.equals(cmbRack.getValue())) {
+                        rackPane.getChildren().clear();
+                        cmbRack.setValue(rackName);
+                        showRack(rackName, cmbReference.getValue());
+                    }
+
+                    Cell finalCell = cell;
+                    Pallet finalPallet = pallet;
+                    Button btn = rackList.stream().filter(button -> button.getId().equals(finalCell.getAddress().split(":")[1] + ":" + finalPallet.getPosition())).findAny().orElse(null);
+                    viewCellUtil.highlightFIFO(btn);
+                }
+
+                if(selectedCells.size()<3){
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "На стеллажах останется последний паллет с материалом " + material, ButtonType.OK);
+                    ServiceLogger.writeInfoLog(this.getClass(),String.format("Пользователь %s, предупрежден о том что остается последний паллет c материалом %s на стеллажах", currentUser.getText(), material));
+                    alert.showAndWait();
+                }
+                ButtonType yes = new ButtonType("Да", ButtonBar.ButtonData.OK_DONE);
+                ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+                Alert question = new Alert(Alert.AlertType.CONFIRMATION
+                        ,"Снять паллет с материалом " + pallet.getMaterial() + " из ячейки " + cell.getAddress().split(":")[1] + " или отменить действие?"
+                        ,yes
+                        ,cancel);
+                question.setTitle("Снятие паллета");
+                Optional<ButtonType> result = question.showAndWait();
+                if (result.orElse(cancel) == yes) {
+                    cell.deletePallet(pallet.getPosition());
+                    GUI.controller.getBase().update(cell);
+                    showRack(cmbRack.getValue(),cmbReference.getValue());
+                }
+            }
+        }
+    }
+
     private void clearCellInfo() {
         cellInfoAddress.setText("");
         cellInfoDate.setText("");
         cellInfoReference.setText("");
+    }
+
+    public LocalDateTime convertToLocalDateTime(Date dateToConvert) {
+        return dateToConvert.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+    public Date convertToDate(LocalDateTime dateToConvert) {
+        return Date.from(dateToConvert.atZone(ZoneId.systemDefault()).toInstant());
     }
 }

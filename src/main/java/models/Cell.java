@@ -2,11 +2,9 @@ package models;
 
 
 
-import com.sun.istack.NotNull;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Arrays;
+
 
 @Entity
 @Table(name = "Cells", uniqueConstraints = {@UniqueConstraint(columnNames = {"address"})})
@@ -54,10 +52,6 @@ public class Cell implements Serializable {
 
     public void setCol(int col) {
         this.col = col;
-    }
-
-    public void setPallets(Pallet[] pallets) {
-        this.pallets = pallets;
     }
 
     public boolean isBlocked() {

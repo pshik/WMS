@@ -104,9 +104,9 @@ public class ViewCellUtil {
         btn.setStyle(BACKGROUND_COLOR_STYLE_STRING + colorToHex(DEFAULT_COLOR));
     }
 
-    public void selectedCell(Button button) {
+    public void selectedCell(Button btn) {
 
-        button.setStyle(BACKGROUND_COLOR_STYLE_STRING + colorToHex(SELECTED_CELL));
+        btn.setStyle(BACKGROUND_COLOR_STYLE_STRING + colorToHex(SELECTED_CELL));
     }
 
     public void setButtonBackground(Button button, String hexColor) {
@@ -118,5 +118,16 @@ public class ViewCellUtil {
         btn.setStyle(BACKGROUND_COLOR_STYLE_STRING + colorToHex(BUSY_COLOR));
         btn.setFont(new Font(0));
         // btn.setStyle(TEXT_COLOR_STYLE_STRING + colorToHex(BUSY_TEXT_COLOR));
+    }
+
+    public void setAvailable(Button btn) {
+        btn.setStyle(BACKGROUND_COLOR_STYLE_STRING + colorToHex(AVAILABLE_CEll));
+    }
+
+    public void highlightRef(Button btn) {
+        btn.setStyle(BACKGROUND_COLOR_STYLE_STRING + colorToHex(HIGHLIGHT));
+    }
+    public void highlightFIFO(Button btn) {
+        btn.setStyle(BACKGROUND_COLOR_STYLE_STRING + colorToHex(HIGHLIGHT_FIFO));
     }
 }

@@ -2,10 +2,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -26,44 +26,40 @@
                   <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
                </VBox.margin>
             </ComboBox>
-            <Pane maxWidth="250.0" minWidth="250.0" prefHeight="200.0" prefWidth="250.0">
+            <Pane maxWidth="250.0" minWidth="250.0" prefHeight="321.0" prefWidth="250.0">
                <children>
                   <VBox>
                      <children>
-                        <ComboBox fx:id="cmbReference" onAction="#showAvailableCells" prefHeight="45.0" prefWidth="225.0">
+                        <ComboBox fx:id="cmbReference" prefHeight="45.0" prefWidth="225.0">
                            <VBox.margin>
                               <Insets bottom="10.0" left="10.0" right="10.0" top="50.0" />
                            </VBox.margin>
                         </ComboBox>
                      </children>
                   </VBox>
-                  <Button fx:id="btnLoad" layoutX="14.0" layoutY="151.0" mnemonicParsing="false" onAction="#loadReference" text="Load">
+                  <Button fx:id="btnLoad" layoutX="14.0" layoutY="134.0" mnemonicParsing="false" onAction="#loadReference" text="Load">
                      <font>
                         <Font name="Tahoma" size="18.0" />
                      </font>
                   </Button>
-                  <Button fx:id="btnPickUp" layoutX="153.0" layoutY="151.0" mnemonicParsing="false" onAction="#pickUpReference" text="Pick Up">
+                  <Button fx:id="btnPickUp" layoutX="153.0" layoutY="134.0" mnemonicParsing="false" onAction="#pickUpReference" text="Pick Up">
                      <font>
                         <Font name="Tahoma" size="18.0" />
                      </font>
                   </Button>
+                  <CheckBox fx:id="manualDate" layoutX="9.0" layoutY="186.0" mnemonicParsing="false" text="Manual Date" />
+                  <CheckBox fx:id="forcePickUp" layoutX="150.0" layoutY="186.0" mnemonicParsing="false" text="Force" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </VBox.margin>
             </Pane>
-            <ScrollPane prefHeight="200.0" prefWidth="200.0" vbarPolicy="ALWAYS">
-               <content>
-                  <TextArea fx:id="txtLog" prefHeight="200.0" prefWidth="225.0">
-                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                     </padding>
-                  </TextArea>
-               </content>
-               <VBox.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-               </VBox.margin>
-            </ScrollPane>
+            <Pane prefHeight="200.0" prefWidth="200.0">
+               <children>
+                  <RadioButton fx:id="showAvailableCells" layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Show Available Cell" />
+                  <RadioButton fx:id="showMaterials" layoutX="14.0" layoutY="96.0" mnemonicParsing="false" text="Show Material" />
+               </children>
+            </Pane>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
                   <Label fx:id="cellInfoAddress" alignment="CENTER">

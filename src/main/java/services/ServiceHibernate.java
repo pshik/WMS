@@ -18,9 +18,9 @@ public class ServiceHibernate {
         Session session = HibernateUtil.getSession();
         Transaction transaction = null;
         transaction = session.beginTransaction();
-        session.save(obj);
+        session.persist(obj);
         transaction.commit();
-
+        HibernateUtil.closeSession();
     }
 
     @SuppressWarnings("unchecked")
@@ -35,6 +35,7 @@ public class ServiceHibernate {
         obj = query.uniqueResult();
 
         transaction.commit();
+        HibernateUtil.closeSession();
         return obj;
     }
 
@@ -47,6 +48,7 @@ public class ServiceHibernate {
         criteria.from(type);
         List<T> data = session.createQuery(criteria).getResultList();
         transaction.commit();
+        HibernateUtil.closeSession();
         return data;
     }
 
@@ -57,6 +59,7 @@ public class ServiceHibernate {
         transaction = session.beginTransaction();
         obj = session.load(theClass, id);
         transaction.commit();
+        HibernateUtil.closeSession();
         return obj;
     }
 
@@ -67,13 +70,15 @@ public class ServiceHibernate {
         Object ent = session.load(theClass, id);
         session.delete(ent);
         transaction.commit();
+        HibernateUtil.closeSession();
     }
 
     public void update(Object obj) {
         Session session = HibernateUtil.getSession();
         Transaction transaction = null;
         transaction = session.beginTransaction();
-        session.update(obj);
+        session.merge(obj);
         transaction.commit();
+        HibernateUtil.closeSession();
     }
 }

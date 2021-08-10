@@ -49,29 +49,24 @@ public class BaseImpl implements Base{
             cells = null;
             racks = null;
             sapReferences = null;
-            controllerGUI.logger.error("Base is not available!");
+            ServiceLogger.writeErrorLog(this.getClass(),"Base is not available!");
         }
     }
 
     @Override
     public void reloadTable(Class theClass) {
-        switch (theClass.getName()){
-            case "User":
-                users = null;
-                users = serviceHibernate.getAllData(theClass);
-                break;
-            case "Rack":
-                racks = null;
-                racks = serviceHibernate.getAllData(theClass);
-                break;
-            case "Cell":
-                cells = null;
-                cells = serviceHibernate.getAllData(theClass);
-                break;
-            case "SapReference":
-                sapReferences = null;
-                sapReferences = serviceHibernate.getAllData(theClass);
-                break;
+        if (User.class.equals(theClass)) {
+            users = null;
+            users = serviceHibernate.getAllData(theClass);
+        } else if (Rack.class.equals(theClass)) {
+            racks = null;
+            racks = serviceHibernate.getAllData(theClass);
+        } else if (Cell.class.equals(theClass)) {
+            cells = null;
+            cells = serviceHibernate.getAllData(theClass);
+        } else if (SapReference.class.equals(theClass)) {
+            sapReferences = null;
+            sapReferences = serviceHibernate.getAllData(theClass);
         }
     }
 
