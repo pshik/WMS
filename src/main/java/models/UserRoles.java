@@ -1,14 +1,11 @@
 package models;
 
-public enum UserRoles {
-    ADMIN( "Administrator"),
-    MANAGER("LogisticManager"),
-    KEEPER("StoreKeeper"),
-    DRIVER("Driver");
+public final class UserRoles {
+    public static final String ADMIN = "Administrator";
+    public static final String MANAGER = "LogisticManager";
+    public static final String KEEPER = "StoreKeeper";
+    public static final String DRIVER = "Driver";
 
-    public final String label;
-
-    private UserRoles(String role) {
-        this.label = role;
+    private UserRoles() {
     }
 }

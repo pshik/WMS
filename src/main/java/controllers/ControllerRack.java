@@ -3,10 +3,12 @@ package controllers;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.skin.DatePickerSkin;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -17,45 +19,32 @@ import models.Pallet;
 import models.Rack;
 import models.SapReference;
 import services.ServiceLogger;
+import utils.AlertDialog;
 import utils.PropertiesUtil;
 import utils.ViewCellUtil;
 import views.GUI;
 
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ControllerRack {
-    private GUI gui;
     @FXML
-    private ComboBox<String> cmbReference;
+    private ComboBox<String> cmbReference,cmbRack;
     @FXML
-    private Button btnLoad;
-    @FXML
-    private Button btnPickUp;
+    private Button btnLoad,btnPickUp;
     @FXML
     private Pane rackPane;
     @FXML
-    private ComboBox<String> cmbRack;
+    private Label cellInfoAddress,cellInfoReference,cellInfoDate,currentUser;
     @FXML
-    private Label cellInfoAddress;
+    private RadioButton showAvailableCells,showMaterials;
     @FXML
-    private Label cellInfoReference;
-    @FXML
-    private Label cellInfoDate;
-    @FXML
-    private Label currentUser;
-    @FXML
-    private RadioButton showAvailableCells;
-    @FXML
-    private RadioButton showMaterials;
-    @FXML
-    private CheckBox manualDate;
-    @FXML
-    private CheckBox forcePickUp;
+    private CheckBox manualDate,forcePickUp;
 
 
     public ComboBox<String> getCmbReference() {
@@ -101,30 +90,41 @@ public class ControllerRack {
     private void loadReference(){
         if(showAvailableCells.isSelected()){
             Button btn = rackList.stream().filter(button -> button.getId().equals(cellInfoAddress.getText())).findAny().orElse(null);
-            markCellsAsBusy();
-            if(btn != null) {
-                if (viewCellUtil.checkAvailableButton(btn)) {
-                    cellInfoReference.setText(cmbReference.getValue());
-                    Cell cell = cells.stream().filter(c -> c.getAddress().equals(cmbRack.getValue() + ":" + cellInfoAddress.getText().split(":")[0])).findAny().orElse(null);
-                    int i = Integer.parseInt(cellInfoAddress.getText().split(":")[1]);
-                    SapReference reference = references.stream().filter(r -> r.getName().equals(cmbReference.getValue())).findAny().orElse(null);
 
-                    Pallet pallet = new Pallet();
-                    pallet.setMaterial(cmbReference.getValue());
-                    pallet.setPosition(i);
-                    pallet.setSize(reference.getSize());
-                    pallet.setLoadingDate(new Date());
+            if (btn != null) {
 
-                    if (cell.addPallet(pallet)) {
-                        GUI.controller.getBase().update(cell);
-                        GUI.controller.getBase().reloadTable(Cell.class);
+                    if (viewCellUtil.checkAvailableButton(btn)) {
+                        cellInfoReference.setText(cmbReference.getValue());
+                        Cell cell = (Cell) GUI.controller.getBase().getObjectByField(Cell.class,cmbRack.getValue() + ":" + cellInfoAddress.getText().split(":")[0],"address");
+                        int i = Integer.parseInt(cellInfoAddress.getText().split(":")[1]);
+                        SapReference reference = references.stream().filter(r -> r.getName().equals(cmbReference.getValue())).findAny().orElse(null);
+
+                        Pallet pallet = new Pallet();
+                        pallet.setMaterial(cmbReference.getValue());
+                        pallet.setPosition(i);
+                        pallet.setSize(reference.getSize());
+                        if(manualDate.isSelected()){
+
+                        LocalDateTime input = AlertDialog.getDate();
+                        Date date = convertToDate(input);
+                        System.out.println(date);
+
+                        pallet.setLoadingDate(date);
+                        }else {
+                            pallet.setLoadingDate(new Date());
+                        }
+
+                        if (cell.addPallet(pallet)) {
+                            GUI.controller.getBase().update(cell);
+                            GUI.controller.getBase().reloadTable(Cell.class);
+                        }
+                        manualDate.setSelected(false);
+                        showAvailableCells.setSelected(false);
+                        changeAvailableInterfaceStatus(false);
+                        showRack(cmbRack.getValue(), cmbReference.getValue());
                     }
-                   // showMaterials.setDisable(false);
-                    showAvailableCells.setSelected(false);
-                    changeAvailableInterfaceStatus(false);
-                    showRack(cmbRack.getValue(), cmbReference.getValue());
                 }
-            }
+            markCellsAsBusy();
         }
     }
 
@@ -142,6 +142,7 @@ public class ControllerRack {
                                 if (b != btn) {
                                     if (!b.getText().equals("")) {
                                         free=false;
+                                        break;
                                     }
                                 }
                             }
@@ -153,6 +154,7 @@ public class ControllerRack {
                                     if(pos == 1 || pos == 4 || pos == 5) {
                                         if (!b.getText().equals("")) {
                                             free = false;
+                                            break;
                                         }
                                     }
                                 }
@@ -165,6 +167,7 @@ public class ControllerRack {
                                     if(pos == 1 || pos == 5 || pos == 6) {
                                         if (!b.getText().equals("")) {
                                             free = false;
+                                            break;
                                         }
                                     }
                                 }
@@ -177,6 +180,7 @@ public class ControllerRack {
                                     if(pos == 1 || pos == 2) {
                                         if (!b.getText().equals("")) {
                                             free = false;
+                                            break;
                                         }
                                     }
                                 }
@@ -189,6 +193,7 @@ public class ControllerRack {
                                     if(pos == 1 || pos == 2 || pos == 3) {
                                         if (!b.getText().equals("")) {
                                             free = false;
+                                            break;
                                         }
                                     }
                                 }
@@ -201,6 +206,7 @@ public class ControllerRack {
                                     if(pos == 1 || pos == 3) {
                                         if (!b.getText().equals("")) {
                                             free = false;
+                                            break;
                                         }
                                     }
                                 }
@@ -392,8 +398,8 @@ public class ControllerRack {
             rowHbox.getChildren().add(row);
 
             for(int j =0;j < currentRackColumnCount; j++){
-                Character name = (char) (65+j);
-                String cellName = name.toString()+(i);
+                char name = (char) (65+j);
+                String cellName = Character.toString(name) +(i);
                 Cell cell = cellsOfRack.stream().filter(c -> cellName.equals(c.getAddress().split(":")[1])).findAny().orElse(null);
                 Pallet[] pallets = cell.getPallets();
 
@@ -493,6 +499,7 @@ public class ControllerRack {
         fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
         fiveSecondsWonder.play();
     }
+
     private void btnConfig(Button button, double btnWidth, double btnHeight, String cellName, int position,Pallet[] pallets) {
         viewCellUtil.setDefault(button);
         setSize(button,btnWidth,btnHeight);
@@ -505,6 +512,7 @@ public class ControllerRack {
                     button.setText(p.getMaterial());
                     currPallet = p;
                     viewCellUtil.setBusyStatus(button);
+                    break;
                 } else {
                     button.setText("");
                 }
@@ -565,7 +573,7 @@ public class ControllerRack {
             }
             Pallet pallet = null;
             Cell cell = null;
-            if(selectedCells.size() >0) {
+            if(selectedCells.size() > 0) {
                 for (Cell c : selectedCells) {
                     for (Pallet p : c.getPallets()) {
                         if(p != null) {
@@ -590,26 +598,33 @@ public class ControllerRack {
                     Pallet finalPallet = pallet;
                     Button btn = rackList.stream().filter(button -> button.getId().equals(finalCell.getAddress().split(":")[1] + ":" + finalPallet.getPosition())).findAny().orElse(null);
                     viewCellUtil.highlightFIFO(btn);
-                }
 
-                if(selectedCells.size()<3){
-                    Alert alert = new Alert(Alert.AlertType.WARNING, "На стеллажах останется последний паллет с материалом " + material, ButtonType.OK);
-                    ServiceLogger.writeInfoLog(this.getClass(),String.format("Пользователь %s, предупрежден о том что остается последний паллет c материалом %s на стеллажах", currentUser.getText(), material));
+
+                    if(selectedCells.size()<3){
+                        Alert alert = new Alert(Alert.AlertType.WARNING, "На стеллажах останется последний паллет с материалом " + material, ButtonType.OK);
+                        ServiceLogger.writeInfoLog(this.getClass(),String.format("Пользователь %s, предупрежден о том что остается последний паллет c материалом %s на стеллажах", currentUser.getText(), material));
+                        alert.showAndWait();
+                    }
+                    ButtonType yes = new ButtonType("Да", ButtonBar.ButtonData.OK_DONE);
+                    ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    Alert question = new Alert(Alert.AlertType.CONFIRMATION
+                            ,"Снять паллет с материалом " + pallet.getMaterial() + " из ячейки " + cell.getAddress().split(":")[1] + " или отменить действие?"
+                            ,yes
+                            ,cancel);
+                    question.setTitle("Снятие паллета");
+                    Optional<ButtonType> result = question.showAndWait();
+                    if (result.orElse(cancel) == yes) {
+                        cell.deletePallet(pallet.getPosition());
+                        GUI.controller.getBase().update(cell);
+                        showRack(cmbRack.getValue(),cmbReference.getValue());
+                    }
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.WARNING, "На стеллажах все паллеты с материалом " + material + " заблокированы.", ButtonType.OK);
                     alert.showAndWait();
                 }
-                ButtonType yes = new ButtonType("Да", ButtonBar.ButtonData.OK_DONE);
-                ButtonType cancel = new ButtonType("Отмена", ButtonBar.ButtonData.CANCEL_CLOSE);
-                Alert question = new Alert(Alert.AlertType.CONFIRMATION
-                        ,"Снять паллет с материалом " + pallet.getMaterial() + " из ячейки " + cell.getAddress().split(":")[1] + " или отменить действие?"
-                        ,yes
-                        ,cancel);
-                question.setTitle("Снятие паллета");
-                Optional<ButtonType> result = question.showAndWait();
-                if (result.orElse(cancel) == yes) {
-                    cell.deletePallet(pallet.getPosition());
-                    GUI.controller.getBase().update(cell);
-                    showRack(cmbRack.getValue(),cmbReference.getValue());
-                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "На стеллажах не найден ни один паллет с материалом " + material, ButtonType.OK);
+                alert.showAndWait();
             }
         }
     }

@@ -4,6 +4,7 @@ package models;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Arrays;
 
 
 @Entity
@@ -73,7 +74,7 @@ public class Cell implements Serializable {
                 ", name='" + address + '\'' +
                 ", row=" + row +
                 ", col=" + col +
-                ", pallets=" + pallets +
+                ", pallets=" + Arrays.toString(pallets) +
                 ", blocked=" + blocked + '\'' +
                 '}';
     }

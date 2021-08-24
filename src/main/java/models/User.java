@@ -5,7 +5,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "Users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
-public class User {
+public class User implements Comparable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_user")
@@ -102,12 +102,17 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return Objects.equals(firstName, user.firstName) && Objects.equals(lastName, user.lastName) && Objects.equals(email, user.email) && Objects.equals(username, user.username) && Objects.equals(role_name, user.role_name);
+        return Objects.equals(firstName, user.firstName)
+                && Objects.equals(lastName, user.lastName)
+                && Objects.equals(email, user.email)
+                && Objects.equals(username, user.username)
+                && Objects.equals(role_name, user.role_name)
+                && Objects.equals(password,user.password);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstName, lastName, email, username, role_name);
+        return Objects.hash(firstName, lastName, email, username, role_name,password);
     }
 
     @Override
@@ -120,5 +125,11 @@ public class User {
                 ", username='" + username + '\'' +
                 ", role_name='" + role_name + '\'' +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        User u = (User) o;
+        return this.username.compareTo(u.getUsername());
     }
 }

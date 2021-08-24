@@ -6,9 +6,12 @@ import services.*;
 import utils.HibernateUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class BaseImpl implements Base{
+    private static final String[] colNames = new String[]{"A","B","C","D","E","F","G","H","I"};
+    private static final String[] rowNames = new String[]{"1","2","3","4","5","6","7","8","9"};
     private List<Cell> cells = new ArrayList<>();
     private List<Rack> racks = new ArrayList<>();
     private List<SapReference> sapReferences = new ArrayList<>();
@@ -50,6 +53,10 @@ public class BaseImpl implements Base{
             racks = null;
             sapReferences = null;
             ServiceLogger.writeErrorLog(this.getClass(),"Base is not available!");
+        }
+        if(users.isEmpty() || cells.isEmpty() || racks.isEmpty() || sapReferences.isEmpty()){
+            initDefaultBase();
+            reloadAll();
         }
     }
 
@@ -98,5 +105,21 @@ public class BaseImpl implements Base{
     @Override
     public void close() {
         HibernateUtil.closeSessionFactory();
+    }
+
+    public void initDefaultBase() {
+        ServiceHibernate serviceHibernate = new ServiceHibernate();
+        User user = new User("admin","Admin","GA",	"spb_admin03@grupoantolin.com",	"Administrator",	"12345");
+        SapReference reference = new SapReference("Null",1,"ChangeName",new Long[]{});
+        Rack rack = new Rack("ChangeName",2,2);
+        serviceHibernate.save(user);
+        serviceHibernate.save(reference);
+        serviceHibernate.save(rack);
+        for(int i = 0; i < rack.getRow(); i++){
+            for( int j = 0; j < rack.getCol(); j++){
+                Cell cell = new Cell(rack.getName() + ":" + colNames[j]+rowNames[i],i,j);
+                serviceHibernate.save(cell);
+            }
+        }
     }
 }

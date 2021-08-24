@@ -60,15 +60,15 @@ public class BaseFake {
         serviceHibernate.save(test4);
         serviceHibernate.save(test5);
 
-        SapReference sapReference1 = new SapReference("61021230234-03",1,"HL", new Integer[]{1,2,3,4,5});
-        SapReference sapReference2 = new SapReference("61021230234-01",2,"WR",new Integer[]{1,2,3,4,5});
-        SapReference sapReference3 = new SapReference("14535322452-01",2,"LR",new Integer[]{1,2,3});
-        SapReference sapReference4 = new SapReference("14535322452",3,"LR",new Integer[]{1,4,5});
+        SapReference sapReference1 = new SapReference("61021230234-03",1,"HL", new Long[]{1L,2L,3L,4L,5L});
+        SapReference sapReference2 = new SapReference("61021230234-01",2,"WR",new Long[]{1L,2L,3L,4L,5L});
+        SapReference sapReference3 = new SapReference("14535322452-01",2,"LR",new Long[]{1L,2L,3L});
+        SapReference sapReference4 = new SapReference("14535322452",3,"LR",new Long[]{1L,4L,5L});
         serviceHibernate.save(sapReference1);
         serviceHibernate.save(sapReference2);
         serviceHibernate.save(sapReference3);
         serviceHibernate.save(sapReference4);
-
+        Cell cellTest = null;
         for (Rack r: serviceHibernate.getAllData(Rack.class)
         ) {
 
@@ -76,6 +76,7 @@ public class BaseFake {
                 for( int j = 0; j < r.getCol(); j++){
                     Cell cell = new Cell(r.getName() + ":" + colNames[j]+rowNames[i],i,j);
                     if(cell.getAddress().equals("Rack1:A5")) {
+                        cellTest = cell;
                         System.out.println(cell.addPallet(testPallet));
                     }
                     if(cell.getAddress().equals("Rack1:B5")) {
@@ -88,6 +89,15 @@ public class BaseFake {
                 }
             }
         }
+
+//        Cell cell = (Cell) serviceHibernate.getObjectByField(Cell.class,"Rack1:A5","address");
+//
+//        cell.addPallet(testPallet1);
+//        serviceHibernate.update(cell);
+//
+//        Cell cell2 = (Cell) serviceHibernate.getObjectByField(Cell.class,"Rack1:A5","address");
+//
+//        System.out.println(cell2.toString());
 
         HibernateUtil.closeSessionFactory();
     }

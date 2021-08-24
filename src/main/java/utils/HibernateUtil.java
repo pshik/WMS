@@ -8,8 +8,8 @@ import org.hibernate.cfg.Configuration;
 public class HibernateUtil {
     private static ThreadLocal<Session> threadLocal = new ThreadLocal<Session>();
     private static String  serverAddress = "localhost";
-    private static String serverPort = "9001";
-    private static String dbName ="test";
+    private static String serverPort = "5432";
+    private static String dbName ="GA";
 
     private static SessionFactory sessionFactory = null;
     static {
@@ -21,7 +21,10 @@ public class HibernateUtil {
 
         Configuration cfg = new Configuration();
         cfg.configure("hibernate.cfg.xml");
-        cfg.setProperty("hibernate.connection.url","jdbc:hsqldb:hsql://" + serverAddress + ":" + serverPort + "/" + dbName);
+
+        cfg.setProperty("hibernate.connection.url","jdbc:postgresql://" + serverAddress + ":" + serverPort + "/" + dbName);
+      //  jdbc:postgresql://localhost:5432/phonesdemo
+        //cfg.setProperty("hibernate.connection.url","jdbc:hsqldb:hsql://" + serverAddress + ":" + serverPort + "/" + dbName);
 
         sessionFactory = cfg.buildSessionFactory();
     }

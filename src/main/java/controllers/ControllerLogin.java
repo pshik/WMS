@@ -20,11 +20,13 @@ public class ControllerLogin {
 
     @FXML
     public void goRackView(String s) throws IOException {
-        gui.showRackView(s);
+        GUI.showRackView(s);
+
     }
 
     public ControllerLogin() {
     }
+
     @FXML
     void keyEnter(KeyEvent event) throws IOException {
         if (event.getCode() == KeyCode.ENTER) {

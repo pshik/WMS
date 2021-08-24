@@ -1,5 +1,6 @@
 package views;
 
+import controllers.ControllerConfig;
 import controllers.ControllerGUI;
 import controllers.ControllerLogin;
 import controllers.ControllerRack;
@@ -7,6 +8,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import models.Rack;
@@ -23,17 +25,18 @@ import static java.lang.Thread.sleep;
 
 public class GUI extends Application {
     //public static PropertiesUtil propertiesUtil = new PropertiesUtil();
-    private Stage primaryStage;
+    public static Stage primaryStage;
     public static ControllerGUI controller = new ControllerGUI();
     private static BorderPane mainLayout;
-
 
     public static void main(String[] args) {
         launch(args);
     }
     @Override
     public void start(Stage stage) throws Exception {
-        this.primaryStage = stage;
+        primaryStage = stage;
+
+       // controller.setGui(this);
         primaryStage.setTitle("GA WMS");
         new ServiceLogger(this.getClass());
         showMainWindow();
@@ -44,11 +47,20 @@ public class GUI extends Application {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(GUI.class.getProtectionDomain().getClassLoader().getResource("fxml/MainApp.fxml"));
         mainLayout = loader.load();
+        ControllerGUI controller = loader.getController();
+        controller.setGui(this);
         Scene scene = new Scene(mainLayout);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-    public static void showRackView(String s) throws IOException {
+
+    @Override
+    public void stop() throws Exception {
+        controller.shutdown();
+        super.stop();
+    }
+
+    public static   void showRackView(String s) throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(GUI.class.getProtectionDomain().getClassLoader().getResource("fxml/RackView.fxml"));
         BorderPane rackPane = loader.load();
@@ -65,6 +77,7 @@ public class GUI extends Application {
 
         mainLayout.setCenter(rackPane);
     }
+
     private  void showLoginView() throws IOException {
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation((GUI.class.getProtectionDomain().getClassLoader().getResource("fxml/LoginView.fxml")));
@@ -77,9 +90,15 @@ public class GUI extends Application {
 
 
     }
-    @Override
-    public void stop() throws Exception {
-        controller.shutdown();
-        super.stop();
+    public void closeApp() {
+        Platform.exit();
+    }
+    public static void showConfigView() throws IOException {
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation((GUI.class.getProtectionDomain().getClassLoader().getResource("fxml/ConfigureDBView.fxml")));
+        AnchorPane loginPane = loader.load();
+        ControllerConfig config = loader.getController();
+        config.init();
+        mainLayout.setCenter(loginPane);
     }
 }

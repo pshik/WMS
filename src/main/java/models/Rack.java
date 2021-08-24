@@ -10,7 +10,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "Racks", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
-public class Rack implements Serializable {
+public class Rack implements Comparable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_rack")
@@ -111,4 +111,9 @@ public class Rack implements Serializable {
     public Rack() {
     }
 
+    @Override
+    public int compareTo(Object o) {
+        Rack r = (Rack) o;
+        return this.getName().compareTo(r.getName());
+    }
 }
